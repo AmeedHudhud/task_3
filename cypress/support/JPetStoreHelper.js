@@ -8,13 +8,10 @@ export const URL = {
   DELETE: "/actions/Cart.action?removeItemFromCart=&workingItemId=${product}",
   MAIN_MENU: "/actions/Catalog.action",
 };
-export const WORD_REGISTRY = {
-  signon: "Login",
-  update: "Update Cart"
+export const TEST_CONSTANTS  = {
+  SIGNON: "Login",
+  UPDATE: "Update Cart"
 }
-const HEADERS = {
-  "Content-Type": "application/x-www-form-urlencoded",
-};
 export const MESSAGE = {
   EMPTY_MESSAGE: "Your cart is empty.",
   Welcome_MESSAGE: "Welcome ${username}!",
@@ -59,10 +56,10 @@ export const login = (username, password) => {
     body: {
       username: username,
       password: password,
-      signon: WORD_REGISTRY.signon,
+      signon: TEST_CONSTANTS .SIGNON,
     },
     headers: {
-      "Content-Type": HEADERS["Content-Type"],
+      "Content-Type": "application/x-www-form-urlencoded",
     },
   }).then((response) => {
     expect(response.status).to.eq(200);
@@ -72,12 +69,11 @@ export const login = (username, password) => {
     cookie = cookies; 
   });
 };
-export const getReponseOrAddProduct = (url,action) => {
-  const path = action=='get' ?url : URL.addProduct.replace('${id}',url)
+export const getReponseOrAddProduct = (url) => {
   return cy
     .request({
       method: "GET",
-      url: path,
+      url: url,
       headers: {
         Cookie: cookie,
       },
@@ -104,13 +100,16 @@ export const verifyProductExistence = (response, products) => {
     }
   })
 };
-export const changeQuantity = (body) => {
+export const changeQuantity = (quantity) => {
   cy.request({
     method: "POST",
-    url: `/${URL.CHANGE_QUANTITY}`,
+    url: URL.CHANGE_QUANTITY,
     headers: { Cookie: cookie },
     form: true,
-    body: body,
+    body: {
+      [PRODUCTS.FISH.LARGE_ANGEL_FISH_ID]:quantity,
+      updateCartQuantities : TEST_CONSTANTS .UPDATE  
+    },
   }).then((response) => {
     cy.log(response.body);
   });
