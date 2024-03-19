@@ -6,3 +6,6 @@ module.exports = defineConfig({
     "specPattern": "**/*.cy.js"
   }
 });
+
+
+

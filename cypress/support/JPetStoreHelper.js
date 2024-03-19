@@ -2,23 +2,23 @@ let cookie;
 export const URL = {
   login: "/actions/Account.action",
   cart: "/actions/Cart.action?viewCart=",
-  LARGE_ANGEL_FISH: "actions/Cart.action?addItemToCart=&workingItemId=EST-1",
-  FEMALE_PUPPY_BULLDOG:
-    "actions/Cart.action?addItemToCart=&workingItemId=EST-7",
+  addProduct: "actions/Cart.action?addItemToCart=&workingItemId=${id}",
+  PRODUCT_PAGE_INFORMATION: "/actions/Catalog.action?viewProduct=&productId=${id}",
   CHANGE_QUANTITY: "/actions/Cart.action",
   DELETE: "/actions/Cart.action?removeItemFromCart=&workingItemId=${product}",
   MAIN_MENU: "/actions/Catalog.action",
-  ANGEL_FISH_PAGE: "actions/Catalog.action?viewProduct=&productId=FI-SW-01",
-  FISH_PAGE: "/actions/Catalog.action?viewCategory=&categoryId=FISH",
 };
+export const WORD_REGISTRY = {
+  signon: "Login",
+  update: "Update Cart"
+}
 const HEADERS = {
   "Content-Type": "application/x-www-form-urlencoded",
-  cookie: "JSESSIONID=DD15901B45C483B047407A87A2CF2A11",
 };
 export const MESSAGE = {
   EMPTY_MESSAGE: "Your cart is empty.",
   Welcome_MESSAGE: "Welcome ${username}!",
-};
+}; 
 export const PRODUCTS = {
   FISH: {
     NAME: "FISH",
@@ -52,35 +52,32 @@ export const PRODUCTS = {
     ADULT_MALE_FINCH_ID: "EST-19",
   },
 };
-export const login = (username, password, signon) => {
-  cy.request({
+export const login = (username, password) => {
+   cy.request({
     method: "POST",
-    url: `/${URL.login}`,
+    url: URL.login,
     body: {
       username: username,
       password: password,
-      signon: signon,
+      signon: WORD_REGISTRY.signon,
     },
     headers: {
       "Content-Type": HEADERS["Content-Type"],
-      Cookie: HEADERS.cookie,
     },
   }).then((response) => {
     expect(response.status).to.eq(200);
-    expect(response.body).to.include(
-      MESSAGE.Welcome_MESSAGE.replace("${username}", username)
+    expect(response.body).to.include(MESSAGE.Welcome_MESSAGE.replace("${username}", username)
     );
-    const cookies = response.requestHeaders.Cookie;
-    const [name, value] = cookies.trim().split("=");
-    cy.setCookie(name, value);
+    const cookies = response.requestHeaders.cookie;
     cookie = cookies;
   });
 };
-export const getBody = (url) => {
+export const getReponseOrAddProduct = (url,action) => {
+  const path = action=='get' ?url : URL.addProduct.replace('${id}',url)
   return cy
     .request({
       method: "GET",
-      url: `/${url}`,
+      url: path,
       headers: {
         Cookie: cookie,
       },
@@ -89,28 +86,23 @@ export const getBody = (url) => {
       return response.body;
     });
 };
-export const verifyTextExistence = (response, value) => {
-  expect(response).to.include(value);
+export const verifyTextExistence = (response, texts) => {
+  texts.forEach(text => {
+    if(text.exist){
+      expect(response).to.include(text.text);
+    }else{
+      expect(response).to.not.include(text,text);
+    }
+  });
 };
-export const addProduct = (product) => {
-  return cy
-    .request({
-      method: "GET",
-      url: `/${product}`,
-      headers: {
-        Cookie: cookie,
-      },
-    })
-    .then((response) => {
-      return response.body;
-    });
-};
-export const verifyProductExistence = (response, product, existance = true) => {
-  if (existance) {
-    expect(response).to.include(product);
-  } else {
-    expect(response).to.not.include(product);
-  }
+export const verifyProductExistence = (response, products) => {
+  products.forEach(product=>{
+    if (product.exist) {
+      expect(response).to.include(product.value);
+    } else {
+      expect(response).to.not.include(product.value);
+    }
+  })
 };
 export const changeQuantity = (body) => {
   cy.request({
@@ -127,7 +119,7 @@ export const deleteProduct = (product) => {
   return cy
     .request({
       method: "GET",
-      url: `/${URL.DELETE.replace("${product}", product)}`,
+      url: URL.DELETE.replace("${product}", product),
       headers: {
         Cookie: cookie,
       },
