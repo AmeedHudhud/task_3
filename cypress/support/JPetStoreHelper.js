@@ -69,7 +69,7 @@ export const login = (username, password) => {
     expect(response.body).to.include(MESSAGE.Welcome_MESSAGE.replace("${username}", username)
     );
     const cookies = response.requestHeaders.cookie;
-    cookie = cookies;
+    cookie = cookies; 
   });
 };
 export const getReponseOrAddProduct = (url,action) => {

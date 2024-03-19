@@ -5,7 +5,7 @@ const VALID_CREDENTIALS = {
   password: "ameed0595",
 };
 describe("JPetStore", () => {
-  beforeEach(() => {
+  before(() => {
   storeHelper.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password)
 });
   it("verify that cart is empty before add any iteam", () => {
