@@ -5,13 +5,9 @@ const VALID_CREDENTIALS = {
   password: "ameed0595",
 };
 describe("JPetStore", () => {
-
   beforeEach(() => {
   storeHelper.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password)
 });
-// it.only('test',()=>{
-
-// })
   it("verify that cart is empty before add any iteam", () => {
     storeHelper.getReponseOrAddProduct(storeHelper.URL.cart,'get').then((response) => {
     storeHelper.verifyTextExistence(response,[{text:storeHelper.MESSAGE.EMPTY_MESSAGE,exist:true}])
@@ -25,7 +21,6 @@ describe("JPetStore", () => {
   });
   it("check total cost", () => {
     storeHelper.getReponseOrAddProduct(storeHelper.URL.cart,'get').then((response) => {
-      cy.log(response)
       storeHelper.checkTotalCost(response,storeHelper.PRODUCTS.FISH.LARGE_ANGEL_FISH_ID);
     });
   });
@@ -57,9 +52,6 @@ describe("JPetStore", () => {
     });
   });
   it("delete product and verify it is deleted", () => {
-    storeHelper.getReponseOrAddProduct(storeHelper.URL.cart,'get').then((response)=>{
-      cy.log(response)
-    })
     storeHelper.deleteProduct(storeHelper.PRODUCTS.FISH.LARGE_ANGEL_FISH_ID).then((response) => {
         storeHelper.verifyProductExistence(response,[{value:storeHelper.PRODUCTS.FISH.TYPE,exist:false}])
       });
